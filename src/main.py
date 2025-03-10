@@ -136,7 +136,7 @@ def load_music():
     """Load the music"""
     song1 = '../resources/sounds/angry-birds.ogg'
     pygame.mixer.music.load(song1)
-    pygame.mixer.music.play(-1)
+    #pygame.mixer.music.play(-1)
 
 
 def sling_action():
@@ -346,7 +346,7 @@ while running:
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_n:
             space.gravity = (0.0, -700.0)
             level.bool_space = False
-        if (pygame.mouse.get_pressed()[0] and x_mouse > 100 and
+        if (pygame.mouse.get_pressed()[0] and x_mouse > 0 and
                 x_mouse < 250 and y_mouse > 370 and y_mouse < 550):
             mouse_pressed = True
         if (event.type == pygame.MOUSEBUTTONUP and
@@ -509,6 +509,9 @@ while running:
     if game_state == 1:
         screen.blit(play_button, (500, 200))
         screen.blit(replay_button, (500, 300))
+
+    pygame.draw.rect(screen, (255,0,0), (0, 370, 250-0, 550-370), 1)
+
     draw_level_cleared()
     draw_level_failed()
     pygame.display.flip()
