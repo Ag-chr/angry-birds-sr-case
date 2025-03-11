@@ -7,11 +7,12 @@ class Bird():
         self.life = 20
         mass = 5
         radius = 12
-        inertia = pm.moment_for_circle(mass, 0, radius, (0, 0))
+        inertia = pm.moment_for_circle(mass, 1, radius, (0, 0))
         body = pm.Body(mass, inertia)
         body.position = x, y
-        power = distance * 53
-        impulse = power * Vec2d(1, 0)
+        power = distance * 53 # hvor meget kraft fuglen har
+        print(power)
+        impulse = power * Vec2d(1, 0) # retning af fuglekast
         angle = -angle
         body.apply_impulse_at_local_point(impulse.rotated(angle))
         shape = pm.Circle(body, radius, (0, 0))
