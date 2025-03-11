@@ -306,6 +306,16 @@ def post_solve_pig_wood(arbiter, space, _):
         space.remove(pig.shape, pig.shape.body)
         pigs.remove(pig)
 
+def calc_angle(dx, dy):
+    angle = math.atan((float(dy))/dx)
+    if dx < 0:
+        angle += math.radians(180)
+    elif dy < 0:
+        angle += math.radians(360)
+    return angle
+
+def launch_bird():
+    pass
 
 # bird and pigs
 space.add_collision_handler(0, 1).post_solve=post_solve_bird_pig
@@ -355,6 +365,7 @@ while running:
                 launch_y = 156
                 if mouse_distance > rope_lenght:
                     mouse_distance = rope_lenght
+
                 if x_mouse < sling_x+5:
                     bird = Bird(mouse_distance, angle, launch_x, launch_y, space)
                     birds.append(bird)
@@ -434,8 +445,6 @@ while running:
         x, y = to_pygame(bird.shape.body.position)
         screen.blit(redbird, (x-22, y-20))
 
-        print(time_to_next_circle - time.time())
-
         if time_to_next_circle - time_ms() < 0:
             time_to_next_circle = time_ms() + tick_to_next_circle
             bird_path.append((x,y))
@@ -459,7 +468,6 @@ while running:
     # Draw pigs
     for pig in pigs:
         i += 1
-        # print (i,pig.life)
         pig = pig.shape
         if pig.body.position.y < 0:
             pigs_to_remove.append(pig)
