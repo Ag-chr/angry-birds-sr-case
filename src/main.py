@@ -8,9 +8,11 @@ import pymunk as pm
 from characters import Bird
 from level import Level
 
-
 pygame.init()
 screen = pygame.display.set_mode((1200, 650))
+clock = pygame.time.Clock()
+
+# load images
 redbird = pygame.image.load(
     "../resources/images/red-bird3.png").convert_alpha()
 background2 = pygame.image.load(
@@ -28,6 +30,7 @@ pig_happy = pygame.image.load(
     "../resources/images/pig_failed.png").convert_alpha()
 stars = pygame.image.load(
     "../resources/images/stars-edited.png").convert_alpha()
+
 rect = pygame.Rect(0, 0, 200, 200)
 star1 = stars.subsurface(rect).copy()
 rect = pygame.Rect(204, 0, 200, 200)
@@ -40,10 +43,8 @@ rect = pygame.Rect(24, 4, 100, 100)
 replay_button = buttons.subsurface(rect).copy()
 rect = pygame.Rect(142, 365, 130, 100)
 next_button = buttons.subsurface(rect).copy()
-clock = pygame.time.Clock()
 rect = pygame.Rect(18, 212, 100, 100)
 play_button = buttons.subsurface(rect).copy()
-clock = pygame.time.Clock()
 running = True
 # the base of the physics
 space = pm.Space()
@@ -51,21 +52,19 @@ space.gravity = (0.0, -700.0)
 pigs = []
 birds = []
 balls = []
-polys = []
 beams = []
 columns = []
-poly_points = []
-ball_number = 0
-polys_dict = {}
 mouse_distance = 0
 rope_lenght = 90
 angle = 0
 x_mouse = 0
 y_mouse = 0
-count = 0
 mouse_pressed = False
-t1 = 0
-tick_to_next_circle = 10
+
+time_ms = lambda: time.time()*1000
+tick_to_next_circle = 50
+time_to_next_circle = time.time() + tick_to_next_circle
+
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 BLACK = (0, 0, 0)
@@ -75,8 +74,6 @@ sling2_x, sling2_y = 160, 450
 score = 0
 game_state = 0
 bird_path = []
-counter = 0
-restart_counter = False
 bonus_score_once = True
 bold_font = pygame.font.SysFont("arial", 30, bold=True)
 bold_font2 = pygame.font.SysFont("arial", 40, bold=True)
@@ -187,39 +184,37 @@ def draw_level_cleared():
     global score
     level_cleared = bold_font3.render("Level Cleared!", 1, WHITE)
     score_level_cleared = bold_font2.render(str(score), 1, WHITE)
-    if level.number_of_birds >= 0 and len(pigs) == 0:
-        if bonus_score_once:
-            score += (level.number_of_birds-1) * 10000
-        bonus_score_once = False
-        game_state = 4
-        rect = pygame.Rect(300, 0, 600, 800)
-        pygame.draw.rect(screen, BLACK, rect)
-        screen.blit(level_cleared, (450, 90))
-        if score >= level.one_star and score <= level.two_star:
-            screen.blit(star1, (310, 190))
-        if score >= level.two_star and score <= level.three_star:
-            screen.blit(star1, (310, 190))
-            screen.blit(star2, (500, 170))
-        if score >= level.three_star:
-            screen.blit(star1, (310, 190))
-            screen.blit(star2, (500, 170))
-            screen.blit(star3, (700, 200))
-        screen.blit(score_level_cleared, (550, 400))
-        screen.blit(replay_button, (510, 480))
-        screen.blit(next_button, (620, 480))
+    if bonus_score_once:
+        score += (level.number_of_birds-1) * 10000
+    bonus_score_once = False
+    game_state = 4
+    rect = pygame.Rect(300, 0, 600, 800)
+    pygame.draw.rect(screen, BLACK, rect)
+    screen.blit(level_cleared, (450, 90))
+    if score >= level.one_star and score <= level.two_star:
+        screen.blit(star1, (310, 190))
+    if score >= level.two_star and score <= level.three_star:
+        screen.blit(star1, (310, 190))
+        screen.blit(star2, (500, 170))
+    if score >= level.three_star:
+        screen.blit(star1, (310, 190))
+        screen.blit(star2, (500, 170))
+        screen.blit(star3, (700, 200))
+    screen.blit(score_level_cleared, (550, 400))
+    screen.blit(replay_button, (510, 480))
+    screen.blit(next_button, (620, 480))
 
 
 def draw_level_failed():
     """Draw level failed"""
     global game_state
     failed = bold_font3.render("Level Failed", 1, WHITE)
-    if level.number_of_birds <= 0 and time.time() - t2 > 5 and len(pigs) > 0:
-        game_state = 3
-        rect = pygame.Rect(300, 0, 600, 800)
-        pygame.draw.rect(screen, BLACK, rect)
-        screen.blit(failed, (450, 90))
-        screen.blit(pig_happy, (380, 120))
-        screen.blit(replay_button, (520, 460))
+    game_state = 3
+    rect = pygame.Rect(300, 0, 600, 800)
+    pygame.draw.rect(screen, BLACK, rect)
+    screen.blit(failed, (450, 90))
+    screen.blit(pig_happy, (380, 120))
+    screen.blit(replay_button, (520, 460))
 
 
 def restart():
@@ -355,7 +350,6 @@ while running:
             mouse_pressed = False
             if level.number_of_birds > 0:
                 level.number_of_birds -= 1
-                t1 = time.time()*1000
                 xo = 154
                 yo = 156
                 if mouse_distance > rope_lenght:
@@ -425,31 +419,26 @@ while running:
     if mouse_pressed and level.number_of_birds > 0:
         sling_action()
     else:
-        if time.time()*1000 - t1 > 300 and level.number_of_birds > 0:
+        if level.number_of_birds > 0:
             screen.blit(redbird, (130, 426))
         else:
             pygame.draw.line(screen, (0, 0, 0), (sling_x, sling_y-8),
                              (sling2_x, sling2_y-7), 5)
     birds_to_remove = []
     pigs_to_remove = []
-    counter += 1
     # Draw birds
     for bird in birds:
         if bird.shape.body.position.y < 0:
             birds_to_remove.append(bird)
-        p = to_pygame(bird.shape.body.position)
-        x, y = p
-        x -= 22
-        y -= 20
-        screen.blit(redbird, (x, y))
-        pygame.draw.circle(screen, BLUE,
-                           p, int(bird.shape.radius), 2)
-        if counter >= 3 and time.time() - t1 < 5:
-            bird_path.append(p)
-            restart_counter = True
-    if restart_counter:
-        counter = 0
-        restart_counter = False
+        x, y = to_pygame(bird.shape.body.position)
+        screen.blit(redbird, (x-22, y-20))
+
+        print(time_to_next_circle - time.time())
+
+        if time_to_next_circle - time_ms() < 0:
+            time_to_next_circle = time_ms() + tick_to_next_circle
+            bird_path.append((x,y))
+
     # Remove birds and pigs
     for bird in birds_to_remove:
         space.remove(bird.shape, bird.shape.body)
@@ -474,8 +463,7 @@ while running:
         if pig.body.position.y < 0:
             pigs_to_remove.append(pig)
 
-        p = to_pygame(pig.body.position)
-        x, y = p
+        x, y = to_pygame(pig.body.position)
 
         angle_degrees = math.degrees(pig.body.angle)
         img = pygame.transform.rotate(pig_image, angle_degrees)
@@ -483,7 +471,6 @@ while running:
         x -= w*0.5
         y -= h*0.5
         screen.blit(img, (x, y))
-        pygame.draw.circle(screen, BLUE, p, int(pig.radius), 2)
     # Draw columns and Beams
     for column in columns:
         column.draw_poly('columns', screen)
@@ -512,8 +499,10 @@ while running:
 
     pygame.draw.rect(screen, (255,0,0), (0, 370, 250-0, 550-370), 1)
 
-    draw_level_cleared()
-    draw_level_failed()
+    if level.number_of_birds >= 0 and len(pigs) == 0:
+        draw_level_cleared()
+    if level.number_of_birds <= 0 and time.time() - t2 > 5 and len(pigs) > 0:
+        draw_level_failed()
     pygame.display.flip()
     clock.tick(50)
     pygame.display.set_caption("fps: " + str(clock.get_fps()))
