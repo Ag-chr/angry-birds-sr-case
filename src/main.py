@@ -311,26 +311,27 @@ def post_solve_pig_wood(arbiter, space, _):
         pigs.remove(pig)
 
 def calc_angle(dx, dy):
-    angle = math.atan(float(dy)/dx)
-    if dx < 0:
+    angle = math.atan(dy/dx)
+    if dx > 0:
         angle += math.radians(180)
-    elif dy < 0:
+    elif dy > 0:
         angle += math.radians(360)
-    #print(math.degrees(angle))
     return angle
 
 def launch_bird(space, mouse_distance, angle, x, y):
     if mouse_distance > rope_lenght:
         mouse_distance = rope_lenght
 
-    bird = Bird(space, mouse_distance, angle + math.radians(180), x, y)
+    bird = Bird(space, mouse_distance, angle, x, y)
     birds.append(bird)
 
 def rotate_image(image, angle, position):
-    rotated_image = pygame.transform.rotate(image, -angle)
+    rotated_image = pygame.transform.rotate(image, angle)
     new_rect = rotated_image.get_rect(center=position)
     return rotated_image, new_rect.topleft
 
+def get_other_tan(angle):
+    return abs(angle - math.radians(360))
 
 # bird and pigs
 space.add_collision_handler(0, 1).post_solve=post_solve_bird_pig
@@ -343,8 +344,10 @@ level = Level(pigs, columns, beams, space)
 level.number = 0
 level.load_level()
 
+#abs(angle - math.radians(360))
 debug_mode = False
 power = 90
+debug_angle = 0
 
 while running:
     # Input handling
@@ -375,19 +378,19 @@ while running:
             debug_mode = not debug_mode
         if debug_mode:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
-                angle -= math.radians(5)
+                debug_angle += math.radians(5)
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
-                angle += math.radians(5)
+                debug_angle -= math.radians(5)
             if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
                 power += 2
-                power = min(power, 90)
+                power = min(power, rope_lenght)
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
                 power -= 2
                 power = max(power, 0)
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                print("angle:", math.degrees(angle))
+                print("angle:", math.degrees(debug_angle))
                 print("power:", power)
-                launch_bird(space, power, angle, 154, 156)
+                launch_bird(space, power, get_other_tan(debug_angle), 154, 156)
 
         if (pygame.mouse.get_pressed()[0] and x_mouse > 0 and
                 x_mouse < 250 and y_mouse > 370 and y_mouse < 550):
@@ -545,7 +548,7 @@ while running:
         draw_level_failed()
 
     if debug_mode:
-        arrow_rotated, rect = rotate_image(arrow, math.degrees(angle) + 180, (150, 450))
+        arrow_rotated, rect = rotate_image(arrow, math.degrees(debug_angle), (150, 450))
         screen.blit(arrow_rotated, (rect[0], rect[1]))
 
 
