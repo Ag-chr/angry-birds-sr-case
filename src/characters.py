@@ -11,7 +11,6 @@ class Bird():
         body = pm.Body(mass, inertia)
         body.position = x, y
         power = distance * 53 # hvor meget kraft fuglen har
-        print(power)
         impulse = power * Vec2d(1, 0) # retning af fuglekast
         angle = -angle
         body.apply_impulse_at_local_point(impulse.rotated(angle))

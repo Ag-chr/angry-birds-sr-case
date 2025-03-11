@@ -31,6 +31,9 @@ pig_happy = pygame.image.load(
     "../resources/images/pig_failed.png").convert_alpha()
 stars = pygame.image.load(
     "../resources/images/stars-edited.png").convert_alpha()
+arrow = pygame.image.load(
+    "../resources/images/arrow.png").convert_alpha()
+arrow = pygame.transform.scale(arrow, (100, 100))
 
 # crop sprites from spritesheet
 star1 = stars.subsurface((0, 0, 200, 200))
@@ -323,6 +326,11 @@ def launch_bird(space, mouse_distance, angle, x, y):
     bird = Bird(space, mouse_distance, angle + math.radians(180), x, y)
     birds.append(bird)
 
+def rotate_image(image, angle, position):
+    rotated_image = pygame.transform.rotate(image, -angle)
+    new_rect = rotated_image.get_rect(center=position)
+    return rotated_image, new_rect.topleft
+
 
 # bird and pigs
 space.add_collision_handler(0, 1).post_solve=post_solve_bird_pig
@@ -334,6 +342,9 @@ space.add_collision_handler(1, 2).post_solve=post_solve_pig_wood
 level = Level(pigs, columns, beams, space)
 level.number = 0
 level.load_level()
+
+debug_mode = False
+power = 90
 
 while running:
     # Input handling
@@ -352,10 +363,6 @@ while running:
                 for line in static_lines1:
                     space.add(line)
                 wall = True
-        elif event.type == pygame.KEYDOWN and event.key == pygame.K_j:
-            test = math.radians(140)
-            print(test)
-            launch_bird(space, 102, test, 154, 156)
 
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_s:
             space.gravity = (0.0, -10.0)
@@ -363,6 +370,25 @@ while running:
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_n:
             space.gravity = (0.0, -700.0)
             level.bool_space = False
+
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_d:
+            debug_mode = not debug_mode
+        if debug_mode:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
+                angle -= math.radians(5)
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
+                angle += math.radians(5)
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
+                power += 2
+                power = min(power, 90)
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
+                power -= 2
+                power = max(power, 0)
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                print("angle:", math.degrees(angle))
+                print("power:", power)
+                launch_bird(space, power, angle, 154, 156)
+
         if (pygame.mouse.get_pressed()[0] and x_mouse > 0 and
                 x_mouse < 250 and y_mouse > 370 and y_mouse < 550):
             mouse_pressed = True
@@ -517,6 +543,12 @@ while running:
         draw_level_cleared()
     if level.number_of_birds <= 0 and time.time() - t2 > 5 and len(pigs) > 0:
         draw_level_failed()
+
+    if debug_mode:
+        arrow_rotated, rect = rotate_image(arrow, math.degrees(angle) + 180, (150, 450))
+        screen.blit(arrow_rotated, (rect[0], rect[1]))
+
+
     pygame.display.flip()
     clock.tick(50)
     pygame.display.set_caption("fps: " + str(clock.get_fps()))
