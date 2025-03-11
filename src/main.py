@@ -315,8 +315,13 @@ def calc_angle(dx, dy):
         angle += math.radians(360)
     return angle + math.radians(180)
 
-def launch_bird():
-    pass
+def launch_bird(space, mouse_distance, angle, x, y):
+    if mouse_distance > rope_lenght:
+        mouse_distance = rope_lenght
+
+    bird = Bird(space, mouse_distance, angle, x, y)
+    birds.append(bird)
+
 
 # bird and pigs
 space.add_collision_handler(0, 1).post_solve=post_solve_bird_pig
@@ -364,11 +369,8 @@ while running:
                 level.number_of_birds -= 1
                 launch_x = 154
                 launch_y = 156
-                if mouse_distance > rope_lenght:
-                    mouse_distance = rope_lenght
 
-                bird = Bird(mouse_distance, angle, launch_x, launch_y, space)
-                birds.append(bird)
+                launch_bird(space, mouse_distance, angle, launch_x, launch_y)
 
                 if level.number_of_birds == 0:
                     t2 = time.time()

@@ -3,7 +3,7 @@ from pymunk import Vec2d
 
 
 class Bird():
-    def __init__(self, distance, angle, x, y, space):
+    def __init__(self, space, distance, angle, x, y):
         self.life = 20
         mass = 5
         radius = 12
