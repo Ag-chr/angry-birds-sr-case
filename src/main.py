@@ -47,7 +47,7 @@ clock = pygame.time.Clock()
 running = True
 # the base of the physics
 space = pm.Space()
-space.gravity = (0.0, -700.0)
+space.gravity = (0.0, -700.0) # Gravity in pixels per second squared
 pigs = []
 birds = []
 balls = []
@@ -57,23 +57,23 @@ columns = []
 poly_points = []
 ball_number = 0
 polys_dict = {}
-mouse_distance = 0
-rope_lenght = 90
-angle = 0
+mouse_distance = 0 # musens distance fra slingshot
+rope_lenght = 90 # maksimale længde af slingshot
+angle = 0 # Vinkel af affyring af fugl
 x_mouse = 0
 y_mouse = 0
 count = 0
 mouse_pressed = False
-t1 = 0
-tick_to_next_circle = 10
+t1 = 0 # Den tid som er i mellem at lave en punkt i fuglens kasteparabel
+tick_to_next_circle = 10 # bruges til ikke en dyt
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
-sling_x, sling_y = 135, 450
-sling2_x, sling2_y = 160, 450
+sling_x, sling_y = 135, 450 # position af den ene pæl af slingshot
+sling2_x, sling2_y = 160, 450 # position ad den anden pæl af slingshot
 score = 0
-game_state = 0
+game_state = 0 # 4: man har vundet fordi alle grise er dræbt 3: man har tabt fordi alle grise ikke blev dræbt 1: intieret affyring 0: spillet er på pause
 bird_path = []
 counter = 0
 restart_counter = False
@@ -112,7 +112,7 @@ def vector(p0, p1):
     b = p1[1] - p0[1]
     return (a, b)
 
-
+# Laves til enheds vektor
 def unit_vector(v):
     """Return the unit vector of the points
     v = (a,b)"""
@@ -153,7 +153,7 @@ def sling_action():
     uv2 = uv[1]
     mouse_distance = distance(sling_x, sling_y, x_mouse, y_mouse)
     pu = (uv1*rope_lenght+sling_x, uv2*rope_lenght+sling_y)
-    bigger_rope = 102
+    bigger_rope = 102 # når ræb er maksimal længde så vil ræbet have denne afstand visuelt
     x_redbird = x_mouse - 20
     y_redbird = y_mouse - 20
     if mouse_distance > rope_lenght:
@@ -329,6 +329,7 @@ while running:
             running = False
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
             running = False
+        # Tilføjer bag væk så grise og ting ikke ryger ud af banen
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_w:
             # Toggle wall
             if wall:
@@ -339,16 +340,19 @@ while running:
                 for line in static_lines1:
                     space.add(line)
                 wall = True
-
+        # tyngdekraften bliver sat langt ned
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_s:
             space.gravity = (0.0, -10.0)
             level.bool_space = True
+        # tyngdekraft bliver sat til et normal niveau
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_n:
             space.gravity = (0.0, -700.0)
             level.bool_space = False
+        # Tjekker område hvor man kan initierer et kast
         if (pygame.mouse.get_pressed()[0] and x_mouse > 0 and
                 x_mouse < 250 and y_mouse > 370 and y_mouse < 550):
             mouse_pressed = True
+        # Affyrere kast hvis man har initiereret et kast
         if (event.type == pygame.MOUSEBUTTONUP and
                 event.button == 1 and mouse_pressed):
             # Release new bird
@@ -360,6 +364,7 @@ while running:
                 yo = 156
                 if mouse_distance > rope_lenght:
                     mouse_distance = rope_lenght
+                # sikre at man skyder den retning man vil
                 if x_mouse < sling_x+5:
                     bird = Bird(mouse_distance, angle, xo, yo, space)
                     birds.append(bird)
@@ -367,7 +372,8 @@ while running:
                     bird = Bird(-mouse_distance, angle, xo, yo, space)
                     birds.append(bird)
                 if level.number_of_birds == 0:
-                    t2 = time.time()
+                    t2 = time.time() # timer til når banen skal fejle, når man har ingen fugle tilbage
+        # tjekker for når man trykker på pause knap oppe i venstre hjørne og andre knapper når man er i pausetilstand
         if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
             if (x_mouse < 60 and y_mouse < 155 and y_mouse > 90):
                 game_state = 1
@@ -490,8 +496,8 @@ while running:
     for beam in beams:
         beam.draw_poly('beams', screen)
     # Update physics
-    dt = 1.0/50.0/2.
-    for x in range(2):
+    dt = 1.0/50.0/100.
+    for x in range(100):
         space.step(dt) # make two updates per frame for better stability
     # Drawing second part of the sling
     rect = pygame.Rect(0, 0, 60, 200)
@@ -517,3 +523,4 @@ while running:
     pygame.display.flip()
     clock.tick(50)
     pygame.display.set_caption("fps: " + str(clock.get_fps()))
+    import math
