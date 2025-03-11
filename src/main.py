@@ -176,6 +176,7 @@ def sling_action():
     if dx == 0:
         dx = 0.00000000000001
     angle = math.atan((float(dy))/dx)
+    angle = calc_angle(dx, dy)
 
 
 def draw_level_cleared():
@@ -312,7 +313,7 @@ def calc_angle(dx, dy):
         angle += math.radians(180)
     elif dy < 0:
         angle += math.radians(360)
-    return angle
+    return angle + math.radians(180)
 
 def launch_bird():
     pass
@@ -366,12 +367,9 @@ while running:
                 if mouse_distance > rope_lenght:
                     mouse_distance = rope_lenght
 
-                if x_mouse < sling_x+5:
-                    bird = Bird(mouse_distance, angle, launch_x, launch_y, space)
-                    birds.append(bird)
-                else:
-                    bird = Bird(-mouse_distance, angle, launch_x, launch_y, space)
-                    birds.append(bird)
+                bird = Bird(mouse_distance, angle, launch_x, launch_y, space)
+                birds.append(bird)
+
                 if level.number_of_birds == 0:
                     t2 = time.time()
         if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
