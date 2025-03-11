@@ -11,6 +11,7 @@ from level import Level
 pygame.init()
 screen = pygame.display.set_mode((1200, 650))
 clock = pygame.time.Clock()
+running = True
 
 # load images
 redbird = pygame.image.load(
@@ -31,53 +32,53 @@ pig_happy = pygame.image.load(
 stars = pygame.image.load(
     "../resources/images/stars-edited.png").convert_alpha()
 
-rect = pygame.Rect(0, 0, 200, 200)
-star1 = stars.subsurface(rect).copy()
-rect = pygame.Rect(204, 0, 200, 200)
-star2 = stars.subsurface(rect).copy()
-rect = pygame.Rect(426, 0, 200, 200)
-star3 = stars.subsurface(rect).copy()
-rect = pygame.Rect(164, 10, 60, 60)
-pause_button = buttons.subsurface(rect).copy()
-rect = pygame.Rect(24, 4, 100, 100)
-replay_button = buttons.subsurface(rect).copy()
-rect = pygame.Rect(142, 365, 130, 100)
-next_button = buttons.subsurface(rect).copy()
-rect = pygame.Rect(18, 212, 100, 100)
-play_button = buttons.subsurface(rect).copy()
-running = True
+# crop sprites from spritesheet
+star1 = stars.subsurface((0, 0, 200, 200))
+star2 = stars.subsurface((204, 0, 200, 200))
+star3 = stars.subsurface((426, 0, 200, 200))
+pause_button = buttons.subsurface((164, 10, 60, 60))
+replay_button = buttons.subsurface((24, 4, 100, 100))
+next_button = buttons.subsurface((142, 365, 130, 100))
+play_button = buttons.subsurface((18, 212, 100, 100))
+
 # the base of the physics
 space = pm.Space()
 space.gravity = (0.0, -700.0)
 pigs = []
 birds = []
-balls = []
 beams = []
 columns = []
+
+# slingshot
 mouse_distance = 0
 rope_lenght = 90
 angle = 0
 x_mouse = 0
 y_mouse = 0
 mouse_pressed = False
+sling_x, sling_y = 135, 450
+sling2_x, sling2_y = 160, 450
 
 time_ms = lambda: time.time()*1000
 tick_to_next_circle = 50
-time_to_next_circle = time.time() + tick_to_next_circle
+time_to_next_circle = time_ms() + tick_to_next_circle
 
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
-sling_x, sling_y = 135, 450
-sling2_x, sling2_y = 160, 450
+
 score = 0
-game_state = 0
-bird_path = []
 bonus_score_once = True
+
+game_state = 0
+
+# text
 bold_font = pygame.font.SysFont("arial", 30, bold=True)
 bold_font2 = pygame.font.SysFont("arial", 40, bold=True)
 bold_font3 = pygame.font.SysFont("arial", 50, bold=True)
+
+bird_path = []
 wall = False
 
 # Static floor
@@ -133,7 +134,7 @@ def load_music():
     """Load the music"""
     song1 = '../resources/sounds/angry-birds.ogg'
     pygame.mixer.music.load(song1)
-    #pygame.mixer.music.play(-1)
+    pygame.mixer.music.play(-1)
 
 
 def sling_action():
@@ -312,7 +313,7 @@ space.add_collision_handler(0, 1).post_solve=post_solve_bird_pig
 space.add_collision_handler(0, 2).post_solve=post_solve_bird_wood
 # pig and wood
 space.add_collision_handler(1, 2).post_solve=post_solve_pig_wood
-load_music()
+#load_music()
 level = Level(pigs, columns, beams, space)
 level.number = 0
 level.load_level()
@@ -350,15 +351,15 @@ while running:
             mouse_pressed = False
             if level.number_of_birds > 0:
                 level.number_of_birds -= 1
-                xo = 154
-                yo = 156
+                launch_x = 154
+                launch_y = 156
                 if mouse_distance > rope_lenght:
                     mouse_distance = rope_lenght
                 if x_mouse < sling_x+5:
-                    bird = Bird(mouse_distance, angle, xo, yo, space)
+                    bird = Bird(mouse_distance, angle, launch_x, launch_y, space)
                     birds.append(bird)
                 else:
-                    bird = Bird(-mouse_distance, angle, xo, yo, space)
+                    bird = Bird(-mouse_distance, angle, launch_x, launch_y, space)
                     birds.append(bird)
                 if level.number_of_birds == 0:
                     t2 = time.time()
