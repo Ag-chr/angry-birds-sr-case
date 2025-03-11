@@ -496,8 +496,8 @@ while running:
     for beam in beams:
         beam.draw_poly('beams', screen)
     # Update physics
-    dt = 1.0/50.0/100.
-    for x in range(100):
+    dt = 1.0/50.0/2.
+    for x in range(2):
         space.step(dt) # make two updates per frame for better stability
     # Drawing second part of the sling
     rect = pygame.Rect(0, 0, 60, 200)
