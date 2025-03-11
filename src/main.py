@@ -308,18 +308,19 @@ def post_solve_pig_wood(arbiter, space, _):
         pigs.remove(pig)
 
 def calc_angle(dx, dy):
-    angle = math.atan((float(dy))/dx)
+    angle = math.atan(float(dy)/dx)
     if dx < 0:
         angle += math.radians(180)
     elif dy < 0:
         angle += math.radians(360)
-    return angle + math.radians(180)
+    #print(math.degrees(angle))
+    return angle
 
 def launch_bird(space, mouse_distance, angle, x, y):
     if mouse_distance > rope_lenght:
         mouse_distance = rope_lenght
 
-    bird = Bird(space, mouse_distance, angle, x, y)
+    bird = Bird(space, mouse_distance, angle + math.radians(180), x, y)
     birds.append(bird)
 
 
@@ -351,6 +352,10 @@ while running:
                 for line in static_lines1:
                     space.add(line)
                 wall = True
+        elif event.type == pygame.KEYDOWN and event.key == pygame.K_j:
+            test = math.radians(140)
+            print(test)
+            launch_bird(space, 102, test, 154, 156)
 
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_s:
             space.gravity = (0.0, -10.0)
