@@ -57,7 +57,11 @@ class Level():
             self.columns.append(Polygon(p, 20, 85, self.space))
 
     def build_0(self):
-        """level 0"""
+        pig1 = Pig(1000, 75, self.space)
+        self.pigs.append(pig1)
+
+    def build_1(self):
+        """level 1"""
         pig1 = Pig(980, 100, self.space)
         pig2 = Pig(985, 182, self.space)
         self.pigs.append(pig1)
@@ -81,8 +85,8 @@ class Level():
         self.two_star = 40000
         self.three_star = 60000
 
-    def build_1(self):
-        """level 1"""
+    def build_2(self):
+        """level 2"""
         pig = Pig(1000, 100, self.space)
         self.pigs.append(pig)
         p = (900, 80)
@@ -99,8 +103,8 @@ class Level():
         if self.bool_space:
             self.number_of_birds = 8
 
-    def build_2(self):
-        """level 2"""
+    def build_3(self):
+        """level 3"""
         pig1 = Pig(880, 180, self.space)
         self.pigs.append(pig1)
         pig2 = Pig(1000, 230, self.space)
@@ -119,8 +123,8 @@ class Level():
         if self.bool_space:
             self.number_of_birds = 8
 
-    def build_3(self):
-        """level 3"""
+    def build_4(self):
+        """level 4"""
         pig = Pig(950, 320, self.space)
         pig.life = 25
         self.pigs.append(pig)
@@ -176,8 +180,8 @@ class Level():
         if self.bool_space:
             self.number_of_birds = 8
 
-    def build_4(self):
-        """level 4"""
+    def build_5(self):
+        """level 5"""
         pig = Pig(900, 300, self.space)
         self.pigs.append(pig)
         pig = Pig(1000, 500, self.space)
@@ -188,8 +192,8 @@ class Level():
         if self.bool_space:
             self.number_of_birds = 8
 
-    def build_5(self):
-        """level 5"""
+    def build_6(self):
+        """level 6"""
         pig = Pig(900, 70, self.space)
         self.pigs.append(pig)
         pig = Pig(1000, 152, self.space)
@@ -210,8 +214,8 @@ class Level():
         if self.bool_space:
             self.number_of_birds = 8
 
-    def build_6(self):
-        """level 6"""
+    def build_7(self):
+        """level 7"""
         pig = Pig(920, 533, self.space)
         pig.life = 40
         self.pigs.append(pig)
@@ -227,8 +231,8 @@ class Level():
         if self.bool_space:
             self.number_of_birds = 8
 
-    def build_7(self):
-        """level 7"""
+    def build_8(self):
+        """level 8"""
         pig = Pig(978, 180, self.space)
         pig.life = 30
         self.pigs.append(pig)
@@ -245,8 +249,8 @@ class Level():
         if self.bool_space:
             self.number_of_birds = 8
 
-    def build_8(self):
-        """level 8"""
+    def build_9(self):
+        """level 9"""
         pig = Pig(1000, 180, self.space)
         pig.life = 30
         self.pigs.append(pig)
@@ -263,8 +267,8 @@ class Level():
         if self.bool_space:
             self.number_of_birds = 8
 
-    def build_9(self):
-        """level 9"""
+    def build_10(self):
+        """level 10"""
         pig = Pig(1000, 180, self.space)
         pig.life = 20
         self.pigs.append(pig)
@@ -279,8 +283,8 @@ class Level():
         if self.bool_space:
             self.number_of_birds = 8
 
-    def build_10(self):
-        """level 10"""
+    def build_11(self):
+        """level 11"""
         pig = Pig(960, 250, self.space)
         pig.life = 20
         self.pigs.append(pig)
@@ -299,8 +303,8 @@ class Level():
         if self.bool_space:
             self.number_of_birds = 8
 
-    def build_11(self):
-        """level 11"""
+    def build_12(self):
+        """level 12"""
         pig = Pig(820, 177, self.space)
         self.pigs.append(pig)
         pig = Pig(960, 150, self.space)
