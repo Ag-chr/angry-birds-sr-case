@@ -346,7 +346,7 @@ level.load_level()
 
 #abs(angle - math.radians(360))
 debug_mode = False
-power = 90
+debug_power = 90
 debug_angle = 0
 
 while running:
@@ -382,15 +382,15 @@ while running:
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
                 debug_angle -= math.radians(5)
             if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
-                power += 2
-                power = min(power, rope_lenght)
+                debug_power += 2
+                debug_power = min(debug_power, rope_lenght)
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
-                power -= 2
-                power = max(power, 0)
+                debug_power -= 2
+                debug_power = max(debug_power, 0)
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                print("angle:", math.degrees(debug_angle))
-                print("power:", power)
-                launch_bird(space, power, get_other_tan(debug_angle), 154, 156)
+                print("angle:", round(math.degrees(debug_angle), 2))
+                print("power:", debug_power)
+                launch_bird(space, debug_power, get_other_tan(debug_angle), 154, 156)
 
         if (pygame.mouse.get_pressed()[0] and x_mouse > 0 and
                 x_mouse < 250 and y_mouse > 370 and y_mouse < 550):
@@ -550,6 +550,11 @@ while running:
     if debug_mode:
         arrow_rotated, rect = rotate_image(arrow, math.degrees(debug_angle), (150, 450))
         screen.blit(arrow_rotated, (rect[0], rect[1]))
+
+        angle_font = bold_font.render(f"Angle: {round(math.degrees(debug_angle),1)}", 1, WHITE)
+        power_font = bold_font.render(f"Power: {debug_power}", 1, WHITE)
+        screen.blit(angle_font, (90, 90))
+        screen.blit(power_font, (90, 120))
 
 
     pygame.display.flip()
