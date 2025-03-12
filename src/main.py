@@ -7,6 +7,7 @@ current_path = os.getcwd()
 import pymunk as pm
 from characters import Bird
 from level import Level
+import pandas as pd
 
 pygame.init()
 screen = pygame.display.set_mode((1200, 650))
@@ -310,6 +311,15 @@ def post_solve_pig_wood(arbiter, space, _):
         space.remove(pig.shape, pig.shape.body)
         pigs.remove(pig)
 
+def fugl_rammer_jord(arbiter, space, _):
+    global bird_in_air
+    global recording
+
+    bird_in_air = False
+    if recording:
+        recording = False
+        gem_kast()
+
 def calc_angle(dx, dy):
     angle = math.atan(dy/dx)
     if dx > 0:
@@ -319,6 +329,9 @@ def calc_angle(dx, dy):
     return angle
 
 def launch_bird(space, mouse_distance, angle, x, y):
+    global bird_in_air
+    bird_in_air = True
+
     if mouse_distance > rope_lenght:
         mouse_distance = rope_lenght
 
@@ -339,6 +352,9 @@ space.add_collision_handler(0, 1).post_solve=post_solve_bird_pig
 space.add_collision_handler(0, 2).post_solve=post_solve_bird_wood
 # pig and wood
 space.add_collision_handler(1, 2).post_solve=post_solve_pig_wood
+#pig and ground
+space.add_collision_handler(0, 3).post_solve=fugl_rammer_jord
+
 #load_music()
 level = Level(pigs, columns, beams, space)
 level.number = 0
@@ -348,6 +364,23 @@ level.load_level()
 debug_mode = False
 debug_power = 90
 debug_angle = 0
+
+
+
+recording = False
+bird_in_air = False
+rec_of_path = pd.DataFrame(columns=["tid", "x", "y"])
+time_in_air = 0
+data_punkt = 1
+
+def gem_kast():
+    global rec_of_path
+    print(rec_of_path)
+    time_in_air = 0
+    data_punkt = 1
+    rec_of_path.to_csv("../optagelse_af_kast.csv", index=False, sep=":")
+    rec_of_path = pd.DataFrame(columns=["tid", "x", "y"])
+    print("optagelse stoppet")
 
 while running:
     # Input handling
@@ -374,6 +407,7 @@ while running:
             space.gravity = (0.0, -700.0)
             level.bool_space = False
 
+        # debug mode
         if event.type == pygame.KEYDOWN and event.key == pygame.K_d:
             debug_mode = not debug_mode
         if debug_mode:
@@ -381,16 +415,28 @@ while running:
                 debug_angle += math.radians(5)
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
                 debug_angle -= math.radians(5)
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
                 debug_power += 2
                 debug_power = min(debug_power, rope_lenght)
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
                 debug_power -= 2
                 debug_power = max(debug_power, 0)
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 print("angle:", round(math.degrees(debug_angle), 2))
                 print("power:", debug_power)
                 launch_bird(space, debug_power, get_other_tan(debug_angle), 154, 156)
+
+            # optage kasteparabel
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_r:
+                if not recording:
+                    print("optagelse startet")
+                    recording = True
+                else:
+                    recording = False
+                    bird_in_air = False
+                    gem_kast()
+                    print("optagelse stoppet")
+
 
         if (pygame.mouse.get_pressed()[0] and x_mouse > 0 and
                 x_mouse < 250 and y_mouse > 370 and y_mouse < 550):
@@ -474,7 +520,7 @@ while running:
     pigs_to_remove = []
     # Draw birds
     for bird in birds:
-        if bird.shape.body.position.y < 0:
+        if bird.body.position.y < 0:
             birds_to_remove.append(bird)
         x, y = to_pygame(bird.shape.body.position)
         screen.blit(redbird, (x-22, y-20))
@@ -555,6 +601,19 @@ while running:
         power_font = bold_font.render(f"Power: {debug_power}", 1, WHITE)
         screen.blit(angle_font, (90, 90))
         screen.blit(power_font, (90, 120))
+
+        if recording and bird_in_air:
+            time_in_air += 1.0/50.0
+            time_in_air = round(time_in_air, 4)
+            try:
+                bird_x = round(birds[-1].body.position.x, 2)
+                bird_y = round(birds[-1].body.position.y, 2)
+                rec_of_path.loc[data_punkt] = {"tid": time_in_air, "x": bird_x, "y": bird_y}
+                data_punkt += 1
+            except IndexError:
+                recording = False
+                bird_in_air = False
+                gem_kast()
 
 
     pygame.display.flip()
