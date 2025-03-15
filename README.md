@@ -1,3 +1,6 @@
+# IKKE MIT KODE (det meste er hvertfald ikke mit)
+jeg har kopireret koden fra denne github repository og lavet nogle ændringer for at jeg kunne bruge det i min sr-case: [https://github.com/estevaofon/angry-birds-python/tree/master]()
+
 Angry Birds in Python
 =====================
 [Youtube Video](https://www.youtube.com/watch?v=B7G5JtCFepE&feature=youtu.be)
